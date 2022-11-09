@@ -1,0 +1,3 @@
+C:/Users/rigac/CLionProjects/Assemblatore/cmake-build-debug/CMakeFiles/Assemblatore.dir
+C:/Users/rigac/CLionProjects/Assemblatore/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/rigac/CLionProjects/Assemblatore/cmake-build-debug/CMakeFiles/rebuild_cache.dir
