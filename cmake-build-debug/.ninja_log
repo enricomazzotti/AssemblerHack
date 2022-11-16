@@ -1,3 +1,7 @@
 # ninja log v5
 1	138	6897073158207388	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
 141	361	6897073160388061	Assemblatore.exe	59fdf962f2c6ed7f
+4	264	6903070881377628	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
+265	640	6903070885088446	Assemblatore.exe	59fdf962f2c6ed7f
+3	136	6903071301663595	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
+137	292	6903071303157431	Assemblatore.exe	59fdf962f2c6ed7f
