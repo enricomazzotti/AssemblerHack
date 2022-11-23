@@ -73,7 +73,11 @@ void removeBrackets(char*);
 
 void printSymbleTable(pSymbleTable head);
 
-void convertIntoString(char *str, int num);
+void convertIntToString(char *str, int num);
+
+void reverseString(char *str);
+
+bool isEligibleA(char *str);
 
 int main() {
     char fileName[100];
@@ -230,6 +234,17 @@ void removeBrackets(char* str){
     *str = '\0';
 }
 
+bool isEligibleA(char *str){
+    if(*str == '\0'){
+        return true;
+    }
+    if(*str == ' ' || *str == '$'|| *str == '.'|| *str == '_' || (*str >= 'A' && *str <= 'Z') || (*str >= 'a' && *str <= 'z')|| (*str >= '0' && *str <= '9') ){
+        return isEligibleA(str+1);
+    }
+
+    return false;
+}
+
 pBitString convertToBitString(pLine headLine){
     // TODO: Implementare la funzione che converte la lista di linee di codice in una lista di stringhe binarie
     pBitString head = NULL;
@@ -238,6 +253,7 @@ pBitString convertToBitString(pLine headLine){
     while (headLine != NULL){
         if  (identifyInstruction(headLine->codeLine) == 1){
             char bitString[17];
+            if (headLine->codeLine[1])
             convertAinstuction(headLine->codeLine, bitString);
             head = insertBitStringInQueue(head, bitString);
         } else{
@@ -250,6 +266,28 @@ pBitString convertToBitString(pLine headLine){
 
 
     return head;
+}
+
+void reverseString(char *str){
+    int l = strlen(str);
+    char app[l];
+    for (int i = 0; i < l; i++) {
+        app[i] = str[i];
+    }
+    for (int i = 0; i < l-1; i++) {
+        str[i] = app[l-i-1];
+    }
+}
+
+void convertIntToString(char *str, int num){
+    int i = 0;
+    while(num > 0){
+        str[i] = (num % 2) + '0';
+        num = num / 2;
+        i++;
+    }
+    str[i] = '\0';
+    reverseString(str);
 }
 
 void convertAinstuction(char *line, char *bitString){
