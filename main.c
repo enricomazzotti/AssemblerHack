@@ -35,7 +35,7 @@ struct SymbleTable {
 typedef struct SymbleTable* pSymbleTable;
 // Prototipi delle funzioni
 
-pLine readFile(char *fileName); // Legge il file e ritorna una lista di linee di codice lette
+pLine readFile(char *fileName, pSymbleTable); // Legge il file e ritorna una lista di linee di codice lette
 
 pBitString convertToBitString(pLine); // Converte la lista di linee di codice in una lista di stringhe binarie (lingiaggio macchina)
 
@@ -65,6 +65,12 @@ pSymbleTable insertSymbleInQueue(pSymbleTable head, char *symble, int address);
 
 int getLastAddress(pBitString head); // Ritorna l'ultimo indirizzo utilizzato
 
+int identifyInstruction(const char *inst); // Ritorna 0 se label, 1 se a inst, 2 c inst
+
+void removeBrackets(char*);
+
+void printSymbleTable(pSymbleTable head);
+
 int main() {
     char fileName[100];
     FILE *file;
@@ -84,12 +90,13 @@ int main() {
     pSymbleTable symbleTable = initSymbleTable();
 
 
-    pLine code = readFile(fileName);
-    writeFileDebug(code, "debug.asm");
-    //pBitString bitString = convertToBitString(code);
+    pLine code = readFile(fileName, symbleTable);
 
+    //printSymbleTable(symbleTable);
+    pBitString machineLanguageCode = convertToBitString(code);
+    writeFileDebug(code, "debug.asm");
     strcat(fileName, ".hack");
-    //writeFile(bitString, fileName);
+    writeFile(machineLanguageCode, fileName);
     printf("File convertito con successo!\n");
 
     return 0;
@@ -126,19 +133,43 @@ pBitString insertBitStringInQueue(pBitString head, char *line){
     return head;
 }
 
-pLine readFile(char *fileName){
+pLine readFile(char *fileName,pSymbleTable symbleTable){
+    int  contatore = 0;
     FILE *file = fopen(fileName, "r");
     pLine head = NULL;
     char line[100];
-    while(fgets(line, 512, file) != NULL){
+    while(fgets(line, 100, file) != NULL){
         trimAll(line);
         removeComments(line);
-        if (*line != '\n' && *(line+1) != '\0' ) { // le righe vuote vengono rimosse tranne l'ultima riga che rimane vuota
-            head = insertLineInQueue(head, line);
+
+        if (*line != '\0' ) { // le righe vuote vengono rimosse tranne l'ultima riga che rimane vuota
+            // identifica l'istruzione
+            if(identifyInstruction(line)==0) {
+                removeBrackets(line);
+                insertSymbleInQueue(symbleTable,line,contatore);
+            } else {
+
+                head = insertLineInQueue(head, line);
+                contatore++;
+            }
         }
 
     }
     return head;
+}
+
+//remove () from str
+void removeBrackets(char* str){
+    char *temp = str;
+
+    while (*temp != '\0'){
+        if (*temp != '(' && *temp != ')'){
+            *str = *temp;
+            str++;
+        }
+        temp++;
+    }
+    *str = '\0';
 }
 
 pBitString convertToBitString(pLine headLine){
@@ -178,11 +209,11 @@ pBitString convertToBitString(pLine headLine){
 }
 
 void convertAinstuction(char *line, char *bitString){
-    line++;
-    char *temp = line;
-    int value = parseint(temp);
-    base10ToBase2(value, bitString);
-
+    if (*line== '@'){
+        line++;
+        int num = parseint(line);
+        base10ToBase2(num, bitString);
+    }
 }
 
 int parseint(char *str){
@@ -225,14 +256,14 @@ void writeFile(pBitString head, char *fileName){
 }
 
 void trimAll(char *str){
-    char *new = str;
-    while(*new != '\0'){
+    char *temp = str;
+    while(*temp != '\0'){
 
-        if(*new != ' ' && *new != '\t'){
-            *str = *new;
+        if(*temp != ' ' && *temp != '\t' && *temp != '\n'){
+            *str = *temp;
             str++;
         }
-        new++;
+        temp++;
     }
     *str = '\0';
 }
@@ -242,14 +273,15 @@ void writeFileDebug(pLine head, char *fileName){
     FILE *file = fopen(fileName, "w");
     pLine temp = head;
     while(temp != NULL) {
-        fprintf(file, "%s", temp->codeLine);
+        if (temp->next == NULL) fprintf(file, "%s", temp->codeLine);
+        else fprintf(file, "%s\n", temp->codeLine);
         temp = temp->next;
     }
 }
 
 pSymbleTable initSymbleTable(){
     pSymbleTable head = NULL;
-    insertSymbleInQueue(head, "R0", 0);
+    head = insertSymbleInQueue(head, "R0", 0);
     insertSymbleInQueue(head, "R1", 1);
     insertSymbleInQueue(head, "R2", 2);
     insertSymbleInQueue(head, "R3", 3);
@@ -303,4 +335,18 @@ void removeComments(char *str){
         new++;
     }
     *str = '\0';
+}
+
+int identifyInstruction(const char *inst){
+    if (*inst == '(') return 0;
+    if (*inst == '@') return 1;
+    else return 2;
+}
+
+void printSymbleTable(pSymbleTable head){
+    pSymbleTable temp = head;
+    while(temp != NULL) {
+        printf( "- %s - %d -\n", temp->symble, temp->address);
+        temp = temp->next;
+    }
 }
