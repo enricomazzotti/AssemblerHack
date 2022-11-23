@@ -97,7 +97,6 @@ int main() {
 
     pSymbleTable symbleTable = initSymbleTable();
 
-
     pLine code = readFile(fileName, symbleTable);
 
     //printSymbleTable(symbleTable);
@@ -235,14 +234,45 @@ void removeBrackets(char* str){
 }
 
 bool isEligibleA(char *str){
-    if(*str == '\0'){
-        return true;
-    }
-    if(*str == ' ' || *str == '$'|| *str == '.'|| *str == '_' || (*str >= 'A' && *str <= 'Z') || (*str >= 'a' && *str <= 'z')|| (*str >= '0' && *str <= '9') ){
-        return isEligibleA(str+1);
-    }
+    bool isNumber = false;
+    bool isLabel = false;
+    if (*str=='@'){
+        str++;
+        if (*str == '$'|| *str == '.'|| *str == '_' || (*str >= 'A' && *str <= 'Z') || (*str >= 'a' && *str <= 'z')){
+            isLabel = true;
+            str++;
+        } else if (*str >= '0' && *str <= '9'){
+            isNumber = true;
+            str++;
+        } else {
+            return false;
+        }
 
-    return false;
+        if (isNumber){
+            while (*str != '\0'){
+                if (*str >= '0' && *str <= '9'){
+                    str++;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        if (isLabel){
+            while (*str != '\0'){
+                if (*str == '$'|| *str == '.'|| *str == '_' || (*str >= 'A' && *str <= 'Z') || (*str >= 'a' && *str <= 'z') || (*str >= '0' && *str <= '9')){
+                    str++;
+                } else {
+                    return false;
+                }
+            }
+
+        }
+
+    } else {
+        return false;
+    }
+    return true;
 }
 
 pBitString convertToBitString(pLine headLine){
@@ -274,7 +304,7 @@ void reverseString(char *str){
     for (int i = 0; i < l; i++) {
         app[i] = str[i];
     }
-    for (int i = 0; i < l-1; i++) {
+    for (int i = 0; i < l; i++) {
         str[i] = app[l-i-1];
     }
 }
@@ -423,7 +453,6 @@ void removeComments(char *str){
     *str = '\0';
 }
 
-// TODO: sarebbe meglio migliorarla in modo da non perettere a stringhe non accettate di essere identificate come C instruction
 int identifyInstruction(const char *inst){
     if (*inst == '(') return 0;
     if (*inst == '@') return 1;
