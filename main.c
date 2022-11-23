@@ -20,7 +20,7 @@ typedef struct Line* pLine;
 
 struct BitString {
     int address;
-    char machineLangaugeLine[100];
+    char machineLangaugeLine[17];
     struct BitString* next;
 };
 
@@ -52,6 +52,8 @@ void removeComments(char *str); // Rimuove i commenti da una stringa
 void writeFileDebug(pLine head, char *fileName); // Scrive il file di debug
 
 void convertAinstuction(char *line, char *bitString); // Converte una istruzione A in una stringa binaria
+
+void convertCinstruction(char *line, char *bitString); // Converte una istruzione C in una stringa binaria
 
 int parseint(char *str); // Converte una stringa in un intero
 
@@ -94,7 +96,7 @@ int main() {
 
     //printSymbleTable(symbleTable);
     pBitString machineLanguageCode = convertToBitString(code);
-    writeFileDebug(code, "debug.asm");
+    //writeFileDebug(code, "debug.asm");
     strcat(fileName, ".hack");
     writeFile(machineLanguageCode, fileName);
     printf("File convertito con successo!\n");
@@ -158,6 +160,60 @@ pLine readFile(char *fileName,pSymbleTable symbleTable){
     return head;
 }
 
+//TODO: da controllare
+void convertCinstruction(char *line, char *bitString){
+    char *dest = strtok(line, "=");
+    char *comp = strtok(NULL, ";");
+    char *jump = strtok(NULL, ";");
+    if(dest == NULL){
+        dest = "null";
+    }
+    if(jump == NULL){
+        jump = "null";
+    }
+    strcpy(bitString, "111");
+    if(strcmp(dest, "null") == 0){
+        strcat(bitString, "000");
+    } else if(strcmp(dest, "M") == 0){
+        strcat(bitString, "001");
+    } else if(strcmp(dest, "D") == 0){
+        strcat(bitString, "010");
+    } else if(strcmp(dest, "MD") == 0){
+        strcat(bitString, "011");
+    } else if(strcmp(dest, "A") == 0){
+        strcat(bitString, "100");
+    } else if(strcmp(dest, "AM") == 0){
+        strcat(bitString, "101");
+    } else if(strcmp(dest, "AD") == 0){
+        strcat(bitString, "110");
+    } else if(strcmp(dest, "AMD") == 0){
+        strcat(bitString, "111");
+    }
+    if(strcmp(comp, "0") == 0){
+        strcat(bitString, "0101010");
+    } else if(strcmp(comp, "1") == 0){
+        strcat(bitString, "0111111");
+    } else if(strcmp(comp, "-1") == 0){
+        strcat(bitString, "0111010");
+    } else if(strcmp(comp, "D") == 0){
+        strcat(bitString, "0001100");
+    } else if(strcmp(comp, "A") == 0){
+        strcat(bitString, "0110000");
+    } else if(strcmp(comp, "!D") == 0){
+        strcat(bitString, "0001101");
+    } else if(strcmp(comp, "!A") == 0){
+        strcat(bitString, "0110001");
+    } else if(strcmp(comp, "-D") == 0){
+        strcat(bitString, "0001111");
+    } else if(strcmp(comp, "-A") == 0){
+        strcat(bitString, "0110011");
+    } else if(strcmp(comp, "D+1") == 0){
+        strcat(bitString, "0011111");
+    } else if(strcmp(comp, "A+1") == 0){
+
+    }
+}
+
 //remove () from str
 void removeBrackets(char* str){
     char *temp = str;
@@ -176,29 +232,15 @@ pBitString convertToBitString(pLine headLine){
     // TODO: Implementare la funzione che converte la lista di linee di codice in una lista di stringhe binarie
     pBitString head = NULL;
     pLine temp = headLine;
-    /*
-     while (headLine != NULL){
-        if(headLine->codeLine[0] == '@'){
-            char bitString[16];
-            //convertAinstuction(headLine->codeLine, bitString);
-            head = insertBitStringInQueue(head, bitString);
-        } else{
-            char bitString[16];
-
-            head = insertBitStringInQueue(head, bitString);
-        }
-        headLine = headLine->next;
-    }
-     */
 
     while (headLine != NULL){
-        if(headLine->codeLine[0] == '@'){
-            char bitString[16];
-            //convertAinstuction(headLine->codeLine, bitString);
+        if  (identifyInstruction(headLine->codeLine) == 1){
+            char bitString[17];
+            convertAinstuction(headLine->codeLine, bitString);
             head = insertBitStringInQueue(head, bitString);
         } else{
-            char bitString[16];
-
+            char bitString[17];
+            //convertCinstruction(headLine->codeLine, bitString);
             head = insertBitStringInQueue(head, bitString);
         }
         headLine = headLine->next;
@@ -229,7 +271,7 @@ int parseint(char *str){
 void base10ToBase2(int num, char *bitString){
     int i = 0;
     while(num > 0){
-        bitString[i] = num % 2;
+        bitString[i] = '0'+(num % 2);
         num = num / 2;
         i++;
     }
@@ -337,6 +379,7 @@ void removeComments(char *str){
     *str = '\0';
 }
 
+// TODO: sarebbe meglio migliorarla in modo da non perettere a stringhe non accettate di essere identificate come C instruction
 int identifyInstruction(const char *inst){
     if (*inst == '(') return 0;
     if (*inst == '@') return 1;
