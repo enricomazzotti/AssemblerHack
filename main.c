@@ -57,7 +57,7 @@ void convertCinstruction(char *line, char *bitString); // Converte una istruzion
 
 int parseint(char *str); // Converte una stringa in un intero
 
-void base10ToBase2(int num, char *bitString); // Converte un intero in una stringa binaria
+void base10ToBase2on16bit(int num, char *bitString); // Converte un intero in una stringa binaria
 
 pSymbleTable initSymbleTable();
 
@@ -72,6 +72,8 @@ int identifyInstruction(const char *inst); // Ritorna 0 se label, 1 se a inst, 2
 void removeBrackets(char*);
 
 void printSymbleTable(pSymbleTable head);
+
+void convertIntoString(char *str, int num);
 
 int main() {
     char fileName[100];
@@ -254,7 +256,7 @@ void convertAinstuction(char *line, char *bitString){
     if (*line== '@'){
         line++;
         int num = parseint(line);
-        base10ToBase2(num, bitString);
+        base10ToBase2on16bit(num, bitString);
     }
 }
 
@@ -268,12 +270,16 @@ int parseint(char *str){
     return num;
 }
 
-void base10ToBase2(int num, char *bitString){
-    int i = 0;
-    while(num > 0){
-        bitString[i] = '0'+(num % 2);
+void base10ToBase2on16bit(int num, char *bitString){
+    bitString[16] = '\0';
+    int i = 15;
+    while (num > 0){
+        bitString[i] = (num % 2) + '0';
         num = num / 2;
-        i++;
+        i--;
+    } while (i >= 0){
+        bitString[i] = '0';
+        i--;
     }
 }
 
@@ -292,7 +298,7 @@ void writeFile(pBitString head, char *fileName){
     FILE *file = fopen(fileName, "w");
     pBitString temp = head;
     while(temp != NULL) {
-        fprintf(file, "%s", temp->machineLangaugeLine);
+        fprintf(file, "%s\n", temp->machineLangaugeLine);
         temp = temp->next;
     }
 }
