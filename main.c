@@ -6,10 +6,11 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
 #include <stdbool.h>
-#include <ctype.h>
+
 
 struct Line {
     char codeLine[100];
@@ -37,7 +38,7 @@ typedef struct SymbleTable* pSymbleTable;
 
 pLine readFile(char *fileName, pSymbleTable); // Legge il file e ritorna una lista di linee di codice lette
 
-pBitString convertToBitString(pLine); // Converte la lista di linee di codice in una lista di stringhe binarie (lingiaggio macchina)
+pBitString convertToBitString(pLine,pSymbleTable symbleTable); // Converte la lista di linee di codice in una lista di stringhe binarie (lingiaggio macchina)
 
 void writeFile(pBitString head, char *fileName); // Scrive il file di output
 
@@ -51,7 +52,7 @@ void removeComments(char *str); // Rimuove i commenti da una stringa
 
 void writeFileDebug(pLine head, char *fileName); // Scrive il file di debug
 
-void convertAinstuction(char *line, char *bitString); // Converte una istruzione A in una stringa binaria
+void convertAinstruction(char *line, char *bitString); // Converte una istruzione A in una stringa binaria
 
 void convertCinstruction(char *line, char *bitString); // Converte una istruzione C in una stringa binaria
 
@@ -79,6 +80,8 @@ void reverseString(char *str);
 
 bool isEligibleA(char *str);
 
+int searchSymble(pSymbleTable , char*);
+
 int main() {
     char fileName[100];
     FILE *file;
@@ -100,7 +103,7 @@ int main() {
     pLine code = readFile(fileName, symbleTable);
 
     //printSymbleTable(symbleTable);
-    pBitString machineLanguageCode = convertToBitString(code);
+    pBitString machineLanguageCode = convertToBitString(code,symbleTable);
     //writeFileDebug(code, "debug.asm");
     strcat(fileName, ".hack");
     writeFile(machineLanguageCode, fileName);
@@ -275,19 +278,64 @@ bool isEligibleA(char *str){
     return true;
 }
 
-pBitString convertToBitString(pLine headLine){
+pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
     // TODO: Implementare la funzione che converte la lista di linee di codice in una lista di stringhe binarie
     pBitString head = NULL;
     pLine temp = headLine;
+    int contatore = 16;
 
     while (headLine != NULL){
         if  (identifyInstruction(headLine->codeLine) == 1){
-            char bitString[17];
-            if (headLine->codeLine[1])
-            convertAinstuction(headLine->codeLine, bitString);
-            head = insertBitStringInQueue(head, bitString);
+            if (isEligibleA(headLine->codeLine)){
+                // TODO: questa parte va cambiata totalmente
+                // se è una variabile o un'etichetta
+
+                char bitString[17];
+                char *temp = headLine->codeLine+1;
+
+                if (!(headLine->codeLine[1] >= '0' && headLine->codeLine[1] <= '9')){
+                    // se è un'etichetta
+                    // controlla se è in symble table
+                    // se non c'è aggiungilo con un progressivo che parte da 16
+                    int val= searchSymble(symbleTable,temp);
+                    if (val==-1){
+                        // inserisci il simbolo in tabella
+                        char app[17];
+                        convertIntToString(temp,contatore);
+                        app[0] = '@';
+                        app[1] = '\0';
+                        strcat(app, temp);
+
+                        convertAinstruction(app, bitString);
+                        head = insertBitStringInQueue(head, bitString);
+                        contatore++;
+                    }else{
+                        char app[17];
+                        convertIntToString(temp,val);
+                        app[0] = '@';
+                        app[1] = '\0';
+                        strcat(app, temp);
+
+                        convertAinstruction(app, bitString);
+                        head = insertBitStringInQueue(head, bitString);
+                    }
+
+                }else{
+
+                    convertAinstruction(headLine->codeLine, bitString);
+                    head = insertBitStringInQueue(head, bitString);
+                }
+            } else {
+                printf("Errore: %s non è un'istruzione A valida", headLine->codeLine);
+            }
+
+
+
+
         } else{
             char bitString[17];
+            // TODO: implementare la funzione che converte una istruzione C in una stringa binaria
+            strcpy(bitString, "c instruction");
             //convertCinstruction(headLine->codeLine, bitString);
             head = insertBitStringInQueue(head, bitString);
         }
@@ -296,6 +344,16 @@ pBitString convertToBitString(pLine headLine){
 
 
     return head;
+}
+
+int searchSymble(pSymbleTable head, char* symble){
+    while (head != NULL){
+        if (strcmp(head->symble,symble) == 0){
+            return head->address;
+        }
+        head = head->next;
+    }
+    return -1;
 }
 
 void reverseString(char *str){
@@ -309,18 +367,19 @@ void reverseString(char *str){
     }
 }
 
+// todo: controlla questa funzione
 void convertIntToString(char *str, int num){
     int i = 0;
     while(num > 0){
-        str[i] = (num % 2) + '0';
-        num = num / 2;
+        str[i] = (num % 10) + '0';
+        num = num / 10;
         i++;
     }
     str[i] = '\0';
     reverseString(str);
 }
 
-void convertAinstuction(char *line, char *bitString){
+void convertAinstruction(char *line, char *bitString){
     if (*line== '@'){
         line++;
         int num = parseint(line);
