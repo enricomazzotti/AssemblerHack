@@ -82,7 +82,26 @@ bool isEligibleA(char *str);
 
 int searchSymble(pSymbleTable , char*);
 
+void getDest(char *, char *);
+void getComp(char *, char *);
+void getJump(char *, char *);
+
 int main() {
+    while (true){
+        char s[20];
+        gets(s);
+        char dest[4];
+        char comp[4];
+        char jump[4];
+        getDest(s,dest);
+
+        getComp(s,comp);
+
+        getJump(s,jump);
+
+
+        printf("dest: *%s* - comp: *%s* - jump: *%s*\n", dest,comp,jump);
+    }
     char fileName[100];
     FILE *file;
     do{
@@ -168,14 +187,97 @@ pLine readFile(char *fileName,pSymbleTable symbleTable){
     return head;
 }
 
+// stringa deve essere lunga 12
+bool isEligibleC(char *str){
+    if (strlen(str) < 3 || strlen(str) > 12) return false;
+    char *dest[8] = {"null","M","D","MD","A","AM","AD","AMD"};
+    char *comp[28] = {"0","1","-1","D","A","!D","!A","-D","-A","D+1","A+1","D-1","A-1","D+A","D-A","A-D","D&A","D|A","M","!M","-M","M+1","M-1","D+M","D-M","M-D","D&M","D|M"};
+    char *jump[8] = {"null","JGT","JEQ","JGE","JLT","JNE","JLE","JMP"};
+}
+void getDest(char *str,char *dest){
+    if (strchr(str, '=') == NULL) {
+        strcpy(dest, "null");
+        return;
+    }
+    int i = 0;
+    while ( str[i] != '=' ){
+        //printf("%d inserisco: %c",i,str[i]);
+        dest[i] = str[i];
+        //printf(" quindi dest: %c\n",dest[i]);
+        i++;
+    }
+    dest[i] = '\0';
+    //puts (dest);
+    //puts (str);
+}
+void getComp(char *str,char *comp){
+    if (strchr(str, '=') == NULL && strchr(str, ';') == NULL) {
+        strcpy(comp, str);
+    }
+    else if (strchr(str, '=') == NULL){
+        int i = 0;
+        while ( str[i] != ';' ){
+            comp[i] = str[i];
+            i++;
+        }
+        comp[i] = '\0';
+    }
+    else if (strchr(str, ';') == NULL){
+        int i = 0;
+        while ( str[i] != '=' ){
+            i++;
+        }
+        i++;
+        int j = 0;
+        while ( str[i] != '\0' ){
+            comp[j] = str[i];
+            i++;
+            j++;
+        }
+        comp[j] = '\0';
+    }
+    else {
+        int i = 0;
+        while ( str[i] != '=' ){
+            i++;
+        }
+        i++;
+        int j = 0;
+        while ( str[i] != ';' ){
+            comp[j] = str[i];
+            i++;
+            j++;
+        }
+        comp[j] = '\0';
+    }
+}
+void getJump(char *str,char *jump){
+
+    if (strchr(str, ';') == NULL) {
+        strcpy(jump, "null");
+        return;
+    }
+    int i = 0;
+    while ( str[i] != ';' ){
+        i++;
+    }
+    i++;
+    int j = 0;
+    while ( str[i] != '\0' ){
+        jump[j] = str[i];
+        i++;
+        j++;
+    }
+    jump[j] = '\0';
+
+}
+
 //TODO: da controllare
 void convertCinstruction(char *line, char *bitString){
-    char *dest = strtok(line, "=");
-    char *comp = strtok(NULL, ";");
-    char *jump = strtok(NULL, ";");
-    if(dest == NULL){
-        dest = "null";
-    }
+    /*char *dest =
+    char *comp =
+    char *jump =
+
     if(jump == NULL){
         jump = "null";
     }
@@ -220,6 +322,7 @@ void convertCinstruction(char *line, char *bitString){
     } else if(strcmp(comp, "A+1") == 0){
 
     }
+             */
 }
 
 //remove () from str
@@ -287,7 +390,6 @@ pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
     while (headLine != NULL){
         if  (identifyInstruction(headLine->codeLine) == 1){
             if (isEligibleA(headLine->codeLine)){
-                // TODO: questa parte va cambiata totalmente
                 // se è una variabile o un'etichetta
 
                 char bitString[17];
@@ -367,7 +469,6 @@ void reverseString(char *str){
     }
 }
 
-// todo: controlla questa funzione
 void convertIntToString(char *str, int num){
     int i = 0;
     while(num > 0){
