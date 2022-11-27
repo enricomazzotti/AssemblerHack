@@ -34,6 +34,7 @@ struct SymbleTable {
 };
 
 typedef struct SymbleTable* pSymbleTable;
+
 // Prototipi delle funzioni
 
 pLine readFile(char *fileName, pSymbleTable); // Legge il file e ritorna una lista di linee di codice lette
@@ -54,7 +55,7 @@ void writeFileDebug(pLine head, char *fileName); // Scrive il file di debug
 
 void convertAinstruction(char *line, char *bitString); // Converte una istruzione A in una stringa binaria
 
-void convertCinstruction(char *line, char *bitString); // Converte una istruzione C in una stringa binaria
+bool convertCinstruction(char *line, char *bitString); // Converte una istruzione C in una stringa binaria
 
 int parseint(char *str); // Converte una stringa in un intero
 
@@ -63,6 +64,8 @@ void base10ToBase2on16bit(int num, char *bitString); // Converte un intero in un
 pSymbleTable initSymbleTable();
 
 pSymbleTable insertSymbleInQueue(pSymbleTable head, char *symble, int address);
+
+pSymbleTable insertSymbleInHead(pSymbleTable head, char *symble, int address);
 
 //int getSymbolAddress(char *symbol, pBitString head); // Ritorna l'indirizzo di un simbolo
 
@@ -86,22 +89,26 @@ void getDest(char *, char *);
 void getComp(char *, char *);
 void getJump(char *, char *);
 
+
+
 int main() {
-    while (true){
+
+    /*while (true){
         char s[20];
         gets(s);
-        char dest[4];
-        char comp[4];
-        char jump[4];
-        getDest(s,dest);
-
-        getComp(s,comp);
-
-        getJump(s,jump);
 
 
-        printf("dest: *%s* - comp: *%s* - jump: *%s*\n", dest,comp,jump);
-    }
+        char bitstring[17];
+
+
+
+        if(convertCinstruction(s, bitstring)){
+            printf("Eligible %s\n", bitstring);
+        } else {
+            printf("Not Eligible %s\n", bitstring);
+        }
+    }*/
+
     char fileName[100];
     FILE *file;
     do{
@@ -109,8 +116,9 @@ int main() {
         scanf("%s", fileName);
         char fileToOpen[100];
         strcpy(fileToOpen, fileName);
-        strcat(fileName, ".asm");
-        file = fopen(fileName, "r");
+
+        strcat(fileToOpen, ".asm");
+        file = fopen(fileToOpen, "r");
         if(file == NULL){
             printf("Il file non esiste, riprova.\n");
         }
@@ -121,9 +129,10 @@ int main() {
 
     pLine code = readFile(fileName, symbleTable);
 
-    //printSymbleTable(symbleTable);
+
     pBitString machineLanguageCode = convertToBitString(code,symbleTable);
     //writeFileDebug(code, "debug.asm");
+    printSymbleTable(symbleTable);
     strcat(fileName, ".hack");
     writeFile(machineLanguageCode, fileName);
     printf("File convertito con successo!\n");
@@ -184,16 +193,31 @@ pLine readFile(char *fileName,pSymbleTable symbleTable){
         }
 
     }
+    printSymbleTable(symbleTable);
     return head;
 }
 
 // stringa deve essere lunga 12
+/*
 bool isEligibleC(char *str){
-    if (strlen(str) < 3 || strlen(str) > 12) return false;
-    char *dest[8] = {"null","M","D","MD","A","AM","AD","AMD"};
-    char *comp[28] = {"0","1","-1","D","A","!D","!A","-D","-A","D+1","A+1","D-1","A-1","D+A","D-A","A-D","D&A","D|A","M","!M","-M","M+1","M-1","D+M","D-M","M-D","D&M","D|M"};
-    char *jump[8] = {"null","JGT","JEQ","JGE","JLT","JNE","JLE","JMP"};
+
+    // TODO: questa roba non funziona occorre implementare una struttura dati che contenda tuttle le c instruction con le relative codifiche e poi le unisca quando matchano
+    char *destSet[8] = {"null\0","M\0","D\0","MD\0","A\0","AM\0","AD\0","AMD\0"};
+    char *compSet[28] = {"0\0","1\0","-1\0","D\0","A\0","!D\0","!A\0","-D\0","-A\0","D+1\0","A+1\0","D-1\0","A-1\0","D+A\0","D-A\0","A-D\0","D&A\0","D|A\0","M\0","!M\0","-M\0","M+1\0","M-1\0","D+M\0","D-M\0","M-D\0","D&M\0","D|M\0"};
+    char *jumpSet[8] = {"null\0","JGT\0","JEQ\0","JGE\0","JLT\0","JNE\0","JLE\0","JMP\0"};
+    bool destFound = false;
+    bool compFound = false;
+    bool jumpFound = false;
+    for (int i = 0; i < 8; i++) {
+        if (strcmp(dest,destSet[i])==0) destFound = true;
+        if (strcmp(jump,jumpSet[i])==0) jumpFound = true;
+    }
+    for (int i = 0; i < 28; i++) {
+        if (strcmp(comp,compSet[i])==0) compFound = true;
+    }
+    return destFound && compFound && jumpFound;
 }
+ */
 void getDest(char *str,char *dest){
     if (strchr(str, '=') == NULL) {
         strcpy(dest, "null");
@@ -272,57 +296,175 @@ void getJump(char *str,char *jump){
 
 }
 
-//TODO: da controllare
-void convertCinstruction(char *line, char *bitString){
-    /*char *dest =
-    char *comp =
-    char *jump =
+bool convertCinstruction(char *line, char *bitString){
+    if (strlen(line) < 3 || strlen(line) > 12) return false;
 
-    if(jump == NULL){
-        jump = "null";
+    bool translated = true;
+
+    char dest[5];
+    char comp[4];
+    char jump[5];
+    getDest(line,dest);
+    getComp(line,comp);
+    getJump(line,jump);
+    char tdest[4];
+    char tcomp[8];
+    char tjump[4];
+
+    //translate dest
+    if (strcmp(dest, "null") == 0) {
+        strcpy(tdest, "000");
     }
+    else if (strcmp(dest, "M") == 0) {
+        strcpy(tdest, "001");
+    }
+    else if (strcmp(dest, "D") == 0) {
+        strcpy(tdest, "010");
+    }
+    else if (strcmp(dest, "MD") == 0) {
+        strcpy(tdest, "011");
+    }
+    else if (strcmp(dest, "A") == 0) {
+        strcpy(tdest, "100");
+    }
+    else if (strcmp(dest, "AM") == 0) {
+        strcpy(tdest, "101");
+    }
+    else if (strcmp(dest, "AD") == 0) {
+        strcpy(tdest, "110");
+    }
+    else if (strcmp(dest, "AMD") == 0) {
+        strcpy(tdest, "111");
+    }
+    else {
+        translated = false;
+    }
+
+
+    //translate comp
+    if (strcmp(comp, "0") == 0) {
+        strcpy(tcomp, "0101010");
+    }
+    else if (strcmp(comp, "1") == 0) {
+        strcpy(tcomp, "0111111");
+    }
+    else if (strcmp(comp, "-1") == 0) {
+        strcpy(tcomp, "0111010");
+    }
+    else if (strcmp(comp, "D") == 0) {
+        strcpy(tcomp, "0001100");
+    }
+    else if (strcmp(comp, "A") == 0) {
+        strcpy(tcomp, "0110000");
+    }
+    else if (strcmp(comp, "!D") == 0) {
+        strcpy(tcomp, "0001101");
+    }
+    else if (strcmp(comp, "!A") == 0) {
+        strcpy(tcomp, "0110001");
+    }
+    else if (strcmp(comp, "-D") == 0) {
+        strcpy(tcomp, "0001111");
+    }
+    else if (strcmp(comp, "-A") == 0) {
+        strcpy(tcomp, "0110011");
+    }
+    else if (strcmp(comp, "D+1") == 0) {
+        strcpy(tcomp, "0011111");
+    }
+    else if (strcmp(comp, "A+1") == 0) {
+        strcpy(tcomp, "0110111");
+    }
+    else if (strcmp(comp, "D-1") == 0) {
+        strcpy(tcomp, "0001110");
+    }
+    else if (strcmp(comp, "A-1") == 0) {
+        strcpy(tcomp, "0110010");
+    }
+    else if (strcmp(comp, "D+A") == 0 || strcmp(comp, "A+D") == 0) {
+        strcpy(tcomp, "0000010");
+    }
+    else if (strcmp(comp, "D-A") == 0) {
+        strcpy(tcomp, "0010011");
+    }
+    else if (strcmp(comp, "A-D") == 0) {
+        strcpy(tcomp, "0000111");
+    }
+    else if (strcmp(comp, "D&A") == 0 || strcmp(comp, "A&D") == 0) {
+        strcpy(tcomp, "0000000");
+    }
+    else if (strcmp(comp, "D|A") == 0 || strcmp(comp, "A|D") == 0) {
+        strcpy(tcomp, "0010101");
+    }
+    else if (strcmp(comp, "M") == 0) {
+        strcpy(tcomp, "1110000");
+    }
+    else if (strcmp(comp, "!M") == 0) {
+        strcpy(tcomp, "1110001");
+    }
+    else if (strcmp(comp, "-M") == 0) {
+        strcpy(tcomp, "1110011");
+    }
+    else if (strcmp(comp, "M+1") == 0) {
+        strcpy(tcomp, "1110111");
+    }
+    else if (strcmp(comp, "M-1") == 0) {
+        strcpy(tcomp, "1110010");
+    }
+    else if (strcmp(comp, "D+M") == 0 || strcmp(comp, "M+D") == 0) {
+        strcpy(tcomp, "1000010");
+    }
+    else if (strcmp(comp, "D-M") == 0) {
+        strcpy(tcomp, "1010011");
+    }
+    else if (strcmp(comp, "M-D") == 0) {
+        strcpy(tcomp, "1000111");
+    }
+    else if (strcmp(comp, "D&M") == 0 || strcmp(comp, "M&D") == 0) {
+        strcpy(tcomp, "1000000");
+    }
+    else if (strcmp(comp, "D|M") == 0 || strcmp(comp, "M|D") == 0) {
+        strcpy(tcomp, "1010101");
+    }
+    else {
+        translated = false;
+    }
+
+
+    //translate jump
+    if (strcmp(jump, "null") == 0) {
+        strcpy(tjump, "000");
+    }
+    else if (strcmp(jump, "JGT") == 0) {
+        strcpy(tjump, "001");
+    }
+    else if (strcmp(jump, "JEQ") == 0) {
+        strcpy(tjump, "010");
+    }
+    else if (strcmp(jump, "JGE") == 0) {
+        strcpy(tjump, "011");
+    }
+    else if (strcmp(jump, "JLT") == 0) {
+        strcpy(tjump, "100");
+    }
+    else if (strcmp(jump, "JNE") == 0) {
+        strcpy(tjump, "101");
+    }
+    else if (strcmp(jump, "JLE") == 0) {
+        strcpy(tjump, "110");
+    }
+    else if (strcmp(jump, "JMP") == 0) {
+        strcpy(tjump, "111");
+    }
+    else {
+        translated = false;
+    }
+
     strcpy(bitString, "111");
-    if(strcmp(dest, "null") == 0){
-        strcat(bitString, "000");
-    } else if(strcmp(dest, "M") == 0){
-        strcat(bitString, "001");
-    } else if(strcmp(dest, "D") == 0){
-        strcat(bitString, "010");
-    } else if(strcmp(dest, "MD") == 0){
-        strcat(bitString, "011");
-    } else if(strcmp(dest, "A") == 0){
-        strcat(bitString, "100");
-    } else if(strcmp(dest, "AM") == 0){
-        strcat(bitString, "101");
-    } else if(strcmp(dest, "AD") == 0){
-        strcat(bitString, "110");
-    } else if(strcmp(dest, "AMD") == 0){
-        strcat(bitString, "111");
-    }
-    if(strcmp(comp, "0") == 0){
-        strcat(bitString, "0101010");
-    } else if(strcmp(comp, "1") == 0){
-        strcat(bitString, "0111111");
-    } else if(strcmp(comp, "-1") == 0){
-        strcat(bitString, "0111010");
-    } else if(strcmp(comp, "D") == 0){
-        strcat(bitString, "0001100");
-    } else if(strcmp(comp, "A") == 0){
-        strcat(bitString, "0110000");
-    } else if(strcmp(comp, "!D") == 0){
-        strcat(bitString, "0001101");
-    } else if(strcmp(comp, "!A") == 0){
-        strcat(bitString, "0110001");
-    } else if(strcmp(comp, "-D") == 0){
-        strcat(bitString, "0001111");
-    } else if(strcmp(comp, "-A") == 0){
-        strcat(bitString, "0110011");
-    } else if(strcmp(comp, "D+1") == 0){
-        strcat(bitString, "0011111");
-    } else if(strcmp(comp, "A+1") == 0){
-
-    }
-             */
+    strcat(bitString, tcomp);
+    strcat(bitString, tdest);
+    strcat(bitString, tjump);
+    return translated;
 }
 
 //remove () from str
@@ -382,7 +524,6 @@ bool isEligibleA(char *str){
 }
 
 pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
-    // TODO: Implementare la funzione che converte la lista di linee di codice in una lista di stringhe binarie
     pBitString head = NULL;
     pLine temp = headLine;
     int contatore = 16;
@@ -395,13 +536,15 @@ pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
                 char bitString[17];
                 char *temp = headLine->codeLine+1;
 
+                // se è un'etichetta
                 if (!(headLine->codeLine[1] >= '0' && headLine->codeLine[1] <= '9')){
-                    // se è un'etichetta
+
                     // controlla se è in symble table
                     // se non c'è aggiungilo con un progressivo che parte da 16
                     int val= searchSymble(symbleTable,temp);
                     if (val==-1){
                         // inserisci il simbolo in tabella
+                        insertSymbleInQueue(symbleTable,temp,contatore);
                         char app[17];
                         convertIntToString(temp,contatore);
                         app[0] = '@';
@@ -436,24 +579,27 @@ pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
 
         } else{
             char bitString[17];
-            // TODO: implementare la funzione che converte una istruzione C in una stringa binaria
-            strcpy(bitString, "c instruction");
-            //convertCinstruction(headLine->codeLine, bitString);
-            head = insertBitStringInQueue(head, bitString);
+            if (convertCinstruction(headLine->codeLine, bitString)){
+                head = insertBitStringInQueue(head, bitString);
+            } else {
+                printf("Errore: %s non è un'istruzione C valida", headLine->codeLine);
+            }
         }
         headLine = headLine->next;
     }
+    printSymbleTable(symbleTable);
 
 
     return head;
 }
 
 int searchSymble(pSymbleTable head, char* symble){
-    while (head != NULL){
-        if (strcmp(head->symble,symble) == 0){
-            return head->address;
+    pSymbleTable temp = head;
+    while (temp != NULL){
+        if (strcmp(temp->symble,symble) == 0){
+            return temp->address;
         }
-        head = head->next;
+        temp = temp->next;
     }
     return -1;
 }
@@ -599,6 +745,14 @@ pSymbleTable insertSymbleInQueue(pSymbleTable head, char *symble, int address){
     return head;
 }
 
+pSymbleTable insertSymbleInHead(pSymbleTable head, char *symble, int address){
+    pSymbleTable newLine = (pSymbleTable) malloc(sizeof(struct SymbleTable));
+    strcpy(newLine->symble, symble);
+    newLine->address = address;
+    newLine->next = head;
+    return newLine;
+}
+
 void removeComments(char *str){
     char *new = str;
     while(*new != '\0'){
@@ -621,8 +775,10 @@ int identifyInstruction(const char *inst){
 
 void printSymbleTable(pSymbleTable head){
     pSymbleTable temp = head;
+    printf("Symble Table:\n");
     while(temp != NULL) {
         printf( "- %s - %d -\n", temp->symble, temp->address);
         temp = temp->next;
     }
+    printf("End of Symble Table\n");
 }
