@@ -205,14 +205,10 @@ void getDest(char *str,char *dest){
     }
     int i = 0;
     while ( str[i] != '=' ){
-        //printf("%d inserisco: %c",i,str[i]);
         dest[i] = str[i];
-        //printf(" quindi dest: %c\n",dest[i]);
         i++;
     }
     dest[i] = '\0';
-    //puts (dest);
-    //puts (str);
 }
 void getComp(char *str,char *comp){
     if (strchr(str, '=') == NULL && strchr(str, ';') == NULL) {
@@ -447,7 +443,6 @@ int convertCinstruction(char *line, char *bitString){
     return translated;
 }
 
-//remove () from str
 void removeBrackets(char* str){
     char *temp = str;
 
@@ -509,17 +504,15 @@ pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
 
     while (headLine != NULL){
         if  (identifyInstruction(headLine->codeLine) == 1){
-            if (isEligibleA(headLine->codeLine)==1){
-                // se è una variabile o un'etichetta
+            if (isEligibleA(headLine->codeLine)==1){  // se è una variabile o un'etichetta
 
                 char bitString[17];
                 char *temp = headLine->codeLine+1;
 
-                // se è un'etichetta
-                if (!(headLine->codeLine[1] >= '0' && headLine->codeLine[1] <= '9')){
+                if (!(headLine->codeLine[1] >= '0' && headLine->codeLine[1] <= '9')){  // se è un'etichetta
 
                     // controlla se è in symble table
-                    // se non c'è aggiungilo con un progressivo che parte da 16
+                    // se non c'è aggiungilo con il valore del contatore
                     int val= searchSymble(symbleTable,temp);
                     if (val==-1){
                         // inserisci il simbolo in tabella
@@ -711,13 +704,6 @@ pSymbleTable insertSymbleInQueue(pSymbleTable head, char symble[], int address){
     pSymbleTable temp = head;
 
     while(temp->next != NULL ){
-
-        if (strcmp(temp->symble, symble) == 0){ // se il simbolo è già presente lo aggiorno
-            printf("Simbolo %s già presente, aggiorno l'indirizzo", symble);
-            free(newLine);
-            temp->address = address;
-            return head;
-        }
         temp = temp->next;
     }
     temp->next = newLine;
