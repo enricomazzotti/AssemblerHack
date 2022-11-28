@@ -6,16 +6,15 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
+
 
 
 struct Line {
     char codeLine[100];
     struct Line* next;
 };
-
 typedef struct Line* pLine;
 
 struct BitString {
@@ -23,7 +22,6 @@ struct BitString {
     char machineLangaugeLine[17];
     struct BitString* next;
 };
-
 typedef struct BitString* pBitString;
 
 struct SymbleTable {
@@ -31,99 +29,80 @@ struct SymbleTable {
     char symble[100];
     struct SymbleTable* next;
 };
-
 typedef struct SymbleTable* pSymbleTable;
 
 // Prototipi delle funzioni
 
+//fileio.c
 pLine readFile(char *fileName, pSymbleTable); // Legge il file e ritorna una lista di linee di codice lette
-
-pBitString convertToBitString(pLine,pSymbleTable symbleTable); // Converte la lista di linee di codice in una lista di stringhe binarie (lingiaggio macchina)
-
 void writeFile(pBitString head, char *fileName); // Scrive il file di output
 
-pLine insertLineInQueue(pLine head, char *line); // Inserisce una nuova linea di codice in coda alla lista
-
-pBitString insertBitStringInQueue(pBitString head, char *line); // Inserisce una nuova stringa binaria in coda alla lista
-
-void trimAll(char *str); // Rimuove gli spazi bianchi e le tabulazioni da una stringa
-
-void removeComments(char *str); // Rimuove i commenti da una stringa
-
-void writeFileDebug(pLine head, char *fileName); // Scrive il file di debug
-
+//assemlatore.c
+pBitString convertToBitString(pLine,pSymbleTable symbleTable); // Converte la lista di linee di codice in una lista di stringhe binarie (lingiaggio macchina)
 void convertAinstruction(char *line, char *bitString); // Converte una istruzione A in una stringa binaria
-
 int convertCinstruction(char *line, char *bitString); // Converte una istruzione C in una stringa binaria
-
-int parseint(char *str); // Converte una stringa in un intero
-
-void base10ToBase2on16bit(int num, char *bitString); // Converte un intero in una stringa binaria
-
-pSymbleTable initSymbleTable();
-
-pSymbleTable insertSymbleInQueue(pSymbleTable head, char *symble, int address);
-
-pSymbleTable insertSymbleInHead(pSymbleTable head, char *symble, int address);
-
-//int getSymbolAddress(char *symbol, pBitString head); // Ritorna l'indirizzo di un simbolo
-
-int getLastAddress(pBitString head); // Ritorna l'ultimo indirizzo utilizzato
-
-int identifyInstruction(const char *inst); // Ritorna 0 se label, 1 se a inst, 2 c inst
-
-void removeBrackets(char*);
-
-void printSymbleTable(pSymbleTable head);
-
-void convertIntToString(char *str, int num);
-
-void reverseString(char *str);
-
 int isEligibleA(char *str);
 
-int searchSymble(pSymbleTable , char*);
+//bitstring.c
+pLine insertLineInQueue(pLine head, char *line); // Inserisce una nuova linea di codice in coda alla lista
+pBitString insertBitStringInQueue(pBitString head, char *line); // Inserisce una nuova stringa binaria in coda alla lista
 
+//parser.c
+void trimAll(char *str); // Rimuove gli spazi bianchi e le tabulazioni da una stringa
+void removeComments(char *str); // Rimuove i commenti da una stringa
+int parseint(const char *str); // Converte una stringa in un intero
+void base10ToBase2on16bit(int num, char *bitString); // Converte un intero in una stringa binaria
+int identifyInstruction(const char *inst); // Ritorna 0 se label, 1 se a inst, 2 c inst
+void removeBrackets(char*);
+void convertIntToString(char *str, int num);
+void reverseString(char *str);
 void getDest(char *, char *);
 void getComp(char *, char *);
 void getJump(char *, char *);
 
 
-
-int main() {
-
-    /*while (true){
-        char s[20];
-        gets(s);
-
-
-        char bitstring[17];
+//symbletable.c
+pSymbleTable initSymbleTable();
+pSymbleTable insertSymbleInQueue(pSymbleTable head, char *symble, int address);
+pSymbleTable insertSymbleInHead(pSymbleTable head, char *symble, int address);
+int getLastAddress(pBitString head); // Ritorna l'ultimo indirizzo utilizzato
+void printSymbleTable(pSymbleTable head);
+int searchSymble(pSymbleTable , char*);
 
 
+char *getFileName(const char *str);
 
-        if(convertCinstruction(s, bitstring)){
-            printf("Eligible %s\n", bitstring);
-        } else {
-            printf("Not Eligible %s\n", bitstring);
-        }
-    }*/
-
+int main(int argc,char *argv[]) {
     char fileName[100];
     FILE *file;
     char fileToOpen[100];
+
+    if (argc > 1) {
+        strcpy(fileToOpen,argv[1]);
+        strcpy(fileName,  getFileName(fileToOpen));
+    }
+
+
+
+    int failed = 0;
     do{
-        printf("Inserisci il nome del file da convertire (senza estensione): ");
-        scanf("%s", fileName);
+        if (argc == 1 && failed==1)
+        {
+            printf("Inserisci il nome del file da convertire (senza estensione):");
+            scanf("%s", fileName);
 
-        strcpy(fileToOpen, fileName);
+            strcpy(fileToOpen, fileName);
 
-        strcat(fileToOpen, ".asm");
+            strcat(fileToOpen, ".asm");
+        }
         file = fopen(fileToOpen, "r");
         if(file == NULL){
             printf("Il file non esiste, riprova.\n");
+            failed = 1;
         }
     } while (file == NULL);
     fclose(file);
+
 
     pSymbleTable symbleTable = initSymbleTable();
 
@@ -131,13 +110,28 @@ int main() {
 
 
     pBitString machineLanguageCode = convertToBitString(code,symbleTable);
-    //writeFileDebug(code, "debug.asm");
-    printSymbleTable(symbleTable);
+
     strcat(fileName, ".hack");
     writeFile(machineLanguageCode, fileName);
     printf("File convertito con successo!\n");
+    getchar();
 
     return 0;
+}
+
+char *getFileName(const char *str){
+    const char delim = '.';
+    size_t str_len = strlen(str), i = str_len;
+    while (i > 0 && str[i] != delim)
+        --i;
+    if (!i)
+        i = str_len;
+    // Combina con estensione ext
+    const char ext[] = ".hack";
+    const size_t ext_len = strlen(ext);
+    char *res = malloc(sizeof(char) * (i + ext_len + 1));
+    strcpy(strncpy(res, str, i) + i, ext);
+    return res;
 }
 
 pLine insertLineInQueue(pLine head, char *line){
@@ -511,7 +505,6 @@ int isEligibleA(char *str){
 
 pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
     pBitString head = NULL;
-    pLine temp = headLine;
     int contatore = 16;
 
     while (headLine != NULL){
@@ -604,7 +597,7 @@ void reverseString(char *str){
 void convertIntToString(char *str, int num){
     int i = 0;
     while(num > 0){
-        str[i] = (num % 10) + '0';
+        str[i] = num % 10 + '0';
         num = num / 10;
         i++;
     }
@@ -620,7 +613,7 @@ void convertAinstruction(char *line, char *bitString){
     }
 }
 
-int parseint(char *str){
+int parseint(const char *str){
     int i = 0;
     int num = 0;
     while(str[i] != '\0'){
@@ -634,7 +627,7 @@ void base10ToBase2on16bit(int num, char *bitString){
     bitString[16] = '\0';
     int i = 15;
     while (num > 0){
-        bitString[i] = (num % 2) + '0';
+        bitString[i] = num % 2 + '0';
         num = num / 2;
         i--;
     } while (i >= 0){
@@ -675,17 +668,8 @@ void trimAll(char *str){
     }
     *str = '\0';
 }
-//(*str >= 'a'&&*str <= 'z')||(*str >= 'A'&&*str <= 'Z')||(*str >= '@')||(*str >= '(')||(*str >= ')')||(*str >= '\n')
 
-void writeFileDebug(pLine head, char *fileName){
-    FILE *file = fopen(fileName, "w");
-    pLine temp = head;
-    while(temp != NULL) {
-        if (temp->next == NULL) fprintf(file, "%s", temp->codeLine);
-        else fprintf(file, "%s\n", temp->codeLine);
-        temp = temp->next;
-    }
-}
+
 
 pSymbleTable initSymbleTable(){
     pSymbleTable head = NULL;
