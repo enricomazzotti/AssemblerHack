@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
-#include <stdbool.h>
 
 
 struct Line {
@@ -55,7 +54,7 @@ void writeFileDebug(pLine head, char *fileName); // Scrive il file di debug
 
 void convertAinstruction(char *line, char *bitString); // Converte una istruzione A in una stringa binaria
 
-bool convertCinstruction(char *line, char *bitString); // Converte una istruzione C in una stringa binaria
+int convertCinstruction(char *line, char *bitString); // Converte una istruzione C in una stringa binaria
 
 int parseint(char *str); // Converte una stringa in un intero
 
@@ -81,7 +80,7 @@ void convertIntToString(char *str, int num);
 
 void reverseString(char *str);
 
-bool isEligibleA(char *str);
+int isEligibleA(char *str);
 
 int searchSymble(pSymbleTable , char*);
 
@@ -111,10 +110,11 @@ int main() {
 
     char fileName[100];
     FILE *file;
+    char fileToOpen[100];
     do{
         printf("Inserisci il nome del file da convertire (senza estensione): ");
         scanf("%s", fileName);
-        char fileToOpen[100];
+
         strcpy(fileToOpen, fileName);
 
         strcat(fileToOpen, ".asm");
@@ -127,7 +127,7 @@ int main() {
 
     pSymbleTable symbleTable = initSymbleTable();
 
-    pLine code = readFile(fileName, symbleTable);
+    pLine code = readFile(fileToOpen, symbleTable);
 
 
     pBitString machineLanguageCode = convertToBitString(code,symbleTable);
@@ -172,6 +172,7 @@ pBitString insertBitStringInQueue(pBitString head, char *line){
 }
 
 pLine readFile(char *fileName,pSymbleTable symbleTable){
+
     int  contatore = 0;
     FILE *file = fopen(fileName, "r");
     pLine head = NULL;
@@ -180,44 +181,29 @@ pLine readFile(char *fileName,pSymbleTable symbleTable){
         trimAll(line);
         removeComments(line);
 
-        if (*line != '\0' ) { // le righe vuote vengono rimosse tranne l'ultima riga che rimane vuota
+        if (*line != '\0' ) {
             // identifica l'istruzione
             if(identifyInstruction(line)==0) {
                 removeBrackets(line);
+
+                searchSymble(symbleTable,line);
                 insertSymbleInQueue(symbleTable,line,contatore);
+                //printf("Label %s\n", line);
+                //printSymbleTable(symbleTable);
             } else {
 
                 head = insertLineInQueue(head, line);
                 contatore++;
             }
+
         }
 
     }
-    printSymbleTable(symbleTable);
     return head;
 }
 
 // stringa deve essere lunga 12
-/*
-bool isEligibleC(char *str){
 
-    // TODO: questa roba non funziona occorre implementare una struttura dati che contenda tuttle le c instruction con le relative codifiche e poi le unisca quando matchano
-    char *destSet[8] = {"null\0","M\0","D\0","MD\0","A\0","AM\0","AD\0","AMD\0"};
-    char *compSet[28] = {"0\0","1\0","-1\0","D\0","A\0","!D\0","!A\0","-D\0","-A\0","D+1\0","A+1\0","D-1\0","A-1\0","D+A\0","D-A\0","A-D\0","D&A\0","D|A\0","M\0","!M\0","-M\0","M+1\0","M-1\0","D+M\0","D-M\0","M-D\0","D&M\0","D|M\0"};
-    char *jumpSet[8] = {"null\0","JGT\0","JEQ\0","JGE\0","JLT\0","JNE\0","JLE\0","JMP\0"};
-    bool destFound = false;
-    bool compFound = false;
-    bool jumpFound = false;
-    for (int i = 0; i < 8; i++) {
-        if (strcmp(dest,destSet[i])==0) destFound = true;
-        if (strcmp(jump,jumpSet[i])==0) jumpFound = true;
-    }
-    for (int i = 0; i < 28; i++) {
-        if (strcmp(comp,compSet[i])==0) compFound = true;
-    }
-    return destFound && compFound && jumpFound;
-}
- */
 void getDest(char *str,char *dest){
     if (strchr(str, '=') == NULL) {
         strcpy(dest, "null");
@@ -296,10 +282,10 @@ void getJump(char *str,char *jump){
 
 }
 
-bool convertCinstruction(char *line, char *bitString){
-    if (strlen(line) < 3 || strlen(line) > 12) return false;
+int convertCinstruction(char *line, char *bitString){
+    if (strlen(line) < 3 || strlen(line) > 12) return 0;
 
-    bool translated = true;
+    int translated = 1;
 
     char dest[5];
     char comp[4];
@@ -337,7 +323,7 @@ bool convertCinstruction(char *line, char *bitString){
         strcpy(tdest, "111");
     }
     else {
-        translated = false;
+        translated = 0;
     }
 
 
@@ -427,7 +413,7 @@ bool convertCinstruction(char *line, char *bitString){
         strcpy(tcomp, "1010101");
     }
     else {
-        translated = false;
+        translated = 0;
     }
 
 
@@ -457,7 +443,7 @@ bool convertCinstruction(char *line, char *bitString){
         strcpy(tjump, "111");
     }
     else {
-        translated = false;
+        translated = 0;
     }
 
     strcpy(bitString, "111");
@@ -481,46 +467,46 @@ void removeBrackets(char* str){
     *str = '\0';
 }
 
-bool isEligibleA(char *str){
-    bool isNumber = false;
-    bool isLabel = false;
+int isEligibleA(char *str){
+    int isNumber = 0;
+    int isLabel = 0;
     if (*str=='@'){
         str++;
         if (*str == '$'|| *str == '.'|| *str == '_' || (*str >= 'A' && *str <= 'Z') || (*str >= 'a' && *str <= 'z')){
-            isLabel = true;
+            isLabel = 1;
             str++;
         } else if (*str >= '0' && *str <= '9'){
-            isNumber = true;
+            isNumber = 1;
             str++;
         } else {
-            return false;
+            return 0;
         }
 
-        if (isNumber){
+        if (isNumber==1){
             while (*str != '\0'){
                 if (*str >= '0' && *str <= '9'){
                     str++;
                 } else {
-                    return false;
+                    return 0;
                 }
             }
         }
 
-        if (isLabel){
+        if (isLabel==1){
             while (*str != '\0'){
                 if (*str == '$'|| *str == '.'|| *str == '_' || (*str >= 'A' && *str <= 'Z') || (*str >= 'a' && *str <= 'z') || (*str >= '0' && *str <= '9')){
                     str++;
                 } else {
-                    return false;
+                    return 0;
                 }
             }
 
         }
 
     } else {
-        return false;
+        return 0;
     }
-    return true;
+    return 1;
 }
 
 pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
@@ -530,7 +516,7 @@ pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
 
     while (headLine != NULL){
         if  (identifyInstruction(headLine->codeLine) == 1){
-            if (isEligibleA(headLine->codeLine)){
+            if (isEligibleA(headLine->codeLine)==1){
                 // se è una variabile o un'etichetta
 
                 char bitString[17];
@@ -571,7 +557,7 @@ pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
                     head = insertBitStringInQueue(head, bitString);
                 }
             } else {
-                printf("Errore: %s non è un'istruzione A valida", headLine->codeLine);
+                printf("Errore: %s istruzione A valida", headLine->codeLine);
             }
 
 
@@ -579,15 +565,15 @@ pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
 
         } else{
             char bitString[17];
-            if (convertCinstruction(headLine->codeLine, bitString)){
+            if (convertCinstruction(headLine->codeLine, bitString)==1){
                 head = insertBitStringInQueue(head, bitString);
             } else {
-                printf("Errore: %s non è un'istruzione C valida", headLine->codeLine);
+                printf("Errore: %s istruzione C valida", headLine->codeLine);
             }
         }
         headLine = headLine->next;
     }
-    printSymbleTable(symbleTable);
+
 
 
     return head;
@@ -729,7 +715,8 @@ pSymbleTable initSymbleTable(){
     return head;
 }
 
-pSymbleTable insertSymbleInQueue(pSymbleTable head, char *symble, int address){
+pSymbleTable insertSymbleInQueue(pSymbleTable head, char symble[], int address){
+
     pSymbleTable newLine = (pSymbleTable) malloc(sizeof(struct SymbleTable));
     strcpy(newLine->symble, symble);
     newLine->address = address;
@@ -738,10 +725,19 @@ pSymbleTable insertSymbleInQueue(pSymbleTable head, char *symble, int address){
         return newLine;
     }
     pSymbleTable temp = head;
-    while(temp->next != NULL){
+
+    while(temp->next != NULL ){
+
+        if (strcmp(temp->symble, symble) == 0){ // se il simbolo è già presente lo aggiorno
+            printf("Simbolo %s già presente, aggiorno l'indirizzo", symble);
+            free(newLine);
+            temp->address = address;
+            return head;
+        }
         temp = temp->next;
     }
     temp->next = newLine;
+
     return head;
 }
 
