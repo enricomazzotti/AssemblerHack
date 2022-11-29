@@ -41,7 +41,7 @@ pBitString insertBitStringInQueue(pBitString head, char *line){
     return head;
 }
 
-pLine readFile(char *fileName,pSymbleTable symbleTable){
+pLine readFile(char *fileName, pSymbolTable symbleTable){
 
     int  contatore = 0;
     FILE *file = fopen(fileName, "r");
@@ -56,10 +56,10 @@ pLine readFile(char *fileName,pSymbleTable symbleTable){
             if(identifyInstruction(line)==0) {
                 removeBrackets(line);
 
-                searchSymble(symbleTable,line);
-                insertSymbleInQueue(symbleTable,line,contatore);
+                searchSymbol(symbleTable, line);
+                insertSymbolInQueue(symbleTable, line, contatore);
                 //printf("Label %s\n", line);
-                //printSymbleTable(symbleTable);
+                //printSymbolTable(symbleTable);
             } else {
 
                 head = insertLineInQueue(head, line);
@@ -290,7 +290,7 @@ int isEligibleA(char *str){
     return 1;
 }
 
-pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
+pBitString convertToBitString(pLine headLine, pSymbolTable symbleTable){
     pBitString head = NULL;
     int contatore = 16;
 
@@ -303,12 +303,12 @@ pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
 
                 if (!(headLine->codeLine[1] >= '0' && headLine->codeLine[1] <= '9')){  // se è un'etichetta
 
-                    // controlla se è in symble table
+                    // controlla se è in symbol table
                     // se non c'è aggiungilo con il valore del contatore
-                    int val= searchSymble(symbleTable,temp);
+                    int val= searchSymbol(symbleTable, temp);
                     if (val==-1){
                         // inserisci il simbolo in tabella
-                        insertSymbleInQueue(symbleTable,temp,contatore);
+                        insertSymbolInQueue(symbleTable, temp, contatore);
                         char app[17];
                         convertIntToString(temp,contatore);
                         app[0] = '@';

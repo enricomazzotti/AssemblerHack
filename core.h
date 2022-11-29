@@ -12,7 +12,7 @@
 
 #endif //ASSEMBLATORE_CORE_H
 
-#include "symbletable.h"
+#include "symboltable.h"
 #include "parser.h"
 
 struct Line {
@@ -30,9 +30,9 @@ typedef struct BitString* pBitString;
 
 
 //assemlatore.c
-pLine readFile(char *fileName, pSymbleTable); // Legge il file e ritorna una lista di linee di codice lette
+pLine readFile(char *fileName, pSymbolTable); // Legge il file e ritorna una lista di linee di codice lette
 void writeFile(pBitString head, char *fileName); // Scrive il file di output
-pBitString convertToBitString(pLine,pSymbleTable symbleTable); // Converte la lista di linee di codice in una lista di stringhe binarie (lingiaggio macchina)
+pBitString convertToBitString(pLine, pSymbolTable symbleTable); // Converte la lista di linee di codice in una lista di stringhe binarie (lingiaggio macchina)
 void convertAinstruction(char *line, char *bitString); // Converte una istruzione A in una stringa binaria
 int convertCinstruction(char *line, char *bitString); // Converte una istruzione C in una stringa binaria
 int isEligibleA(char *str);

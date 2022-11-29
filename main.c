@@ -46,7 +46,7 @@ int main(int argc,char *argv[]) {
     fclose(file);
 
 
-    pSymbleTable symbleTable = initSymbleTable();
+    pSymbolTable symbleTable = initSymbolTable();
 
     pLine code = readFile(fileToOpen, symbleTable);
 

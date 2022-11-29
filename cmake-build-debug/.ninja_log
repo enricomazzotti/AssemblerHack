@@ -1,12 +1,12 @@
 # ninja log v5
-3	170	6914144768106072	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-171	367	6914144769899870	Assemblatore.exe	bc5fc9fe1e615494
-13	150	6914144767880817	CMakeFiles/Assemblatore.dir/symbletable.c.obj	4c0e5564d92f58a6
-8	136	6914144767740833	CMakeFiles/Assemblatore.dir/parser.c.obj	cf84afd0e678ea41
-1	320	6914152502643489	build.ninja	cb5851ca2bba1cf6
-9	196	6914152506104671	CMakeFiles/Assemblatore.dir/symbletable.c.obj	4c0e5564d92f58a6
-15	198	6914152506114886	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-4	215	6914152506324900	CMakeFiles/Assemblatore.dir/core.c.obj	9b2eacc78449996c
-216	391	6914152507985280	Assemblatore.exe	15cd6f65db1aee48
 5	146	6914153731472928	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
+1	320	6914160133628438	build.ninja	cb5851ca2bba1cf6
 147	341	6914153733399570	Assemblatore.exe	15cd6f65db1aee48
+8	136	6914144767740833	CMakeFiles/Assemblatore.dir/parser.c.obj	cf84afd0e678ea41
+9	196	6914152506104671	CMakeFiles/Assemblatore.dir/symbletable.c.obj	4c0e5564d92f58a6
+4	215	6914152506324900	CMakeFiles/Assemblatore.dir/core.c.obj	9b2eacc78449996c
+3	320	6914160133628438	build.ninja	cb5851ca2bba1cf6
+8	150	6914160136131074	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
+14	164	6914160136311118	CMakeFiles/Assemblatore.dir/symboltable.c.obj	c27381ff8b90ba04
+3	181	6914160136471137	CMakeFiles/Assemblatore.dir/core.c.obj	9b2eacc78449996c
+182	346	6914160138051521	Assemblatore.exe	b2b886a36c6692f2

@@ -3,4 +3,4 @@ project(Assemblatore C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(Assemblatore main.c parser.c parser.h symbletable.c symbletable.h core.c core.h)
+add_executable(Assemblatore main.c parser.c parser.h symboltable.c symboltable.h core.c core.h)
