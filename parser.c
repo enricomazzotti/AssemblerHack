@@ -7,7 +7,7 @@
  */
 
 #include "parser.h"
-#include <string.h>
+
 
 void trimAll(char *str){
     char *temp = str;

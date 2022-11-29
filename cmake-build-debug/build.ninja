@@ -61,6 +61,12 @@ build CMakeFiles/Assemblatore.dir/parser.c.obj: C_COMPILER__Assemblatore_Debug C
   OBJECT_DIR = CMakeFiles\Assemblatore.dir
   OBJECT_FILE_DIR = CMakeFiles\Assemblatore.dir
 
+build CMakeFiles/Assemblatore.dir/symbletable.c.obj: C_COMPILER__Assemblatore_Debug C$:/Users/rigac/CLionProjects/Assemblatore/symbletable.c || cmake_object_order_depends_target_Assemblatore
+  DEP_FILE = CMakeFiles\Assemblatore.dir\symbletable.c.obj.d
+  FLAGS = -g -std=gnu99
+  OBJECT_DIR = CMakeFiles\Assemblatore.dir
+  OBJECT_FILE_DIR = CMakeFiles\Assemblatore.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Assemblatore
@@ -69,7 +75,7 @@ build CMakeFiles/Assemblatore.dir/parser.c.obj: C_COMPILER__Assemblatore_Debug C
 #############################################
 # Link the executable Assemblatore.exe
 
-build Assemblatore.exe: C_EXECUTABLE_LINKER__Assemblatore_Debug CMakeFiles/Assemblatore.dir/main.c.obj CMakeFiles/Assemblatore.dir/parser.c.obj
+build Assemblatore.exe: C_EXECUTABLE_LINKER__Assemblatore_Debug CMakeFiles/Assemblatore.dir/main.c.obj CMakeFiles/Assemblatore.dir/parser.c.obj CMakeFiles/Assemblatore.dir/symbletable.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Assemblatore.dir

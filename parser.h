@@ -3,13 +3,15 @@
  * @date:    16/11/2022
  * @note:    file header che implementa le funzioni per manipolare le stringhe
  * @project: Assemblatore per il linguaggio Assembly Hack
- * @file:    parser.c
+ * @file:    parser.h
  */
 
 #ifndef ASSEMBLATORE_PARSER_H
 #define ASSEMBLATORE_PARSER_H
 
 #endif //ASSEMBLATORE_PARSER_H
+
+#include <string.h>
 
 void trimAll(char *str); // Rimuove gli spazi bianchi e le tabulazioni da una stringa
 void removeComments(char *str); // Rimuove i commenti da una stringa

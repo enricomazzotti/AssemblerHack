@@ -10,7 +10,7 @@
 #include <malloc.h>
 
 #include "parser.h"
-
+#include "symbletable.h"
 
 
 struct Line {
@@ -26,51 +26,21 @@ struct BitString {
 };
 typedef struct BitString* pBitString;
 
-struct SymbleTable {
-    int address;
-    char symble[100];
-    struct SymbleTable* next;
-};
-typedef struct SymbleTable* pSymbleTable;
+
 
 // Prototipi delle funzioni
 
-//fileio.c
+//assemlatore.c
 pLine readFile(char *fileName, pSymbleTable); // Legge il file e ritorna una lista di linee di codice lette
 void writeFile(pBitString head, char *fileName); // Scrive il file di output
-
-//assemlatore.c
 pBitString convertToBitString(pLine,pSymbleTable symbleTable); // Converte la lista di linee di codice in una lista di stringhe binarie (lingiaggio macchina)
 void convertAinstruction(char *line, char *bitString); // Converte una istruzione A in una stringa binaria
 int convertCinstruction(char *line, char *bitString); // Converte una istruzione C in una stringa binaria
 int isEligibleA(char *str);
-
-//bitstring.c
+int getLastAddress(pBitString head); // Ritorna l'ultimo indirizzo utilizzato
 pLine insertLineInQueue(pLine head, char *line); // Inserisce una nuova linea di codice in coda alla lista
 pBitString insertBitStringInQueue(pBitString head, char *line); // Inserisce una nuova stringa binaria in coda alla lista
 
-//parser.c
-/*
-void trimAll(char *str); // Rimuove gli spazi bianchi e le tabulazioni da una stringa
-void removeComments(char *str); // Rimuove i commenti da una stringa
-int parseint(const char *str); // Converte una stringa in un intero
-void base10ToBase2on16bit(int num, char *bitString); // Converte un intero in una stringa binaria
-int identifyInstruction(const char *inst); // Ritorna 0 se label, 1 se a inst, 2 c inst
-void removeBrackets(char*);
-void convertIntToString(char *str, int num);
-void reverseString(char *str);
-void getDest(char *, char *);
-void getComp(char *, char *);
-void getJump(char *, char *);
-*/
-
-//symbletable.c
-pSymbleTable initSymbleTable();
-pSymbleTable insertSymbleInQueue(pSymbleTable head, char *symble, int address);
-pSymbleTable insertSymbleInHead(pSymbleTable head, char *symble, int address);
-int getLastAddress(pBitString head); // Ritorna l'ultimo indirizzo utilizzato
-void printSymbleTable(pSymbleTable head);
-int searchSymble(pSymbleTable , char*);
 
 
 char *getFileName(const char *str);
@@ -484,16 +454,6 @@ pBitString convertToBitString(pLine headLine,pSymbleTable symbleTable){
     return head;
 }
 
-int searchSymble(pSymbleTable head, char* symble){
-    pSymbleTable temp = head;
-    while (temp != NULL){
-        if (strcmp(temp->symble,symble) == 0){
-            return temp->address;
-        }
-        temp = temp->next;
-    }
-    return -1;
-}
 
 
 
@@ -535,71 +495,11 @@ void writeFile(pBitString head, char *fileName){
 
 
 
-pSymbleTable initSymbleTable(){
-    pSymbleTable head = NULL;
-    head = insertSymbleInQueue(head, "R0", 0);
-    insertSymbleInQueue(head, "R1", 1);
-    insertSymbleInQueue(head, "R2", 2);
-    insertSymbleInQueue(head, "R3", 3);
-    insertSymbleInQueue(head, "R4", 4);
-    insertSymbleInQueue(head, "R5", 5);
-    insertSymbleInQueue(head, "R6", 6);
-    insertSymbleInQueue(head, "R7", 7);
-    insertSymbleInQueue(head, "R8", 8);
-    insertSymbleInQueue(head, "R9", 9);
-    insertSymbleInQueue(head, "R10", 10);
-    insertSymbleInQueue(head, "R11", 11);
-    insertSymbleInQueue(head, "R12", 12);
-    insertSymbleInQueue(head, "R13", 13);
-    insertSymbleInQueue(head, "R14", 14);
-    insertSymbleInQueue(head, "R15", 15);
-    insertSymbleInQueue(head, "SCREEN", 16384);
-    insertSymbleInQueue(head, "KBD", 24576);
-    insertSymbleInQueue(head, "SP", 0);
-    insertSymbleInQueue(head, "LCL", 1);
-    insertSymbleInQueue(head, "ARG", 2);
-    insertSymbleInQueue(head, "THIS", 3);
-    insertSymbleInQueue(head, "THAT", 4);
-    return head;
-}
-
-pSymbleTable insertSymbleInQueue(pSymbleTable head, char symble[], int address){
-
-    pSymbleTable newLine = (pSymbleTable) malloc(sizeof(struct SymbleTable));
-    strcpy(newLine->symble, symble);
-    newLine->address = address;
-    newLine->next = NULL;
-    if(head == NULL){
-        return newLine;
-    }
-    pSymbleTable temp = head;
-
-    while(temp->next != NULL ){
-        temp = temp->next;
-    }
-    temp->next = newLine;
-
-    return head;
-}
-
-pSymbleTable insertSymbleInHead(pSymbleTable head, char *symble, int address){
-    pSymbleTable newLine = (pSymbleTable) malloc(sizeof(struct SymbleTable));
-    strcpy(newLine->symble, symble);
-    newLine->address = address;
-    newLine->next = head;
-    return newLine;
-}
 
 
 
 
 
-void printSymbleTable(pSymbleTable head){
-    pSymbleTable temp = head;
-    printf("Symble Table:\n");
-    while(temp != NULL) {
-        printf( "- %s - %d -\n", temp->symble, temp->address);
-        temp = temp->next;
-    }
-    printf("End of Symble Table\n");
-}
+
+
+
