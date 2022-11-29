@@ -94,11 +94,13 @@ void convertIntToString(char *str, int num){
 void reverseString(char *str){
     int l = strlen(str);
     char app[l];
-    for (int i = 0; i < l; i++) {
+    int i;
+    for (i = 0; i < l; i++) {
         app[i] = str[i];
     }
-    for (int i = 0; i < l; i++) {
-        str[i] = app[l-i-1];
+    int j;
+    for ( j= 0; j < l; j++) {
+        str[j] = app[l-j-1];
     }
 }
 
