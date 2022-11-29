@@ -1,23 +1,6 @@
 # ninja log v5
-3	128	6912638540695315	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-129	232	6912638541695594	Assemblatore.exe	59fdf962f2c6ed7f
-2	136	6912639149763803	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-137	238	6912639150734018	Assemblatore.exe	59fdf962f2c6ed7f
-2	130	6912640847989445	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-131	274	6912640849339748	Assemblatore.exe	59fdf962f2c6ed7f
-3	179	6912645920865289	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-179	522	6912645923845974	Assemblatore.exe	59fdf962f2c6ed7f
-3	147	6912689457313159	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-148	263	6912689458403397	Assemblatore.exe	59fdf962f2c6ed7f
-3	130	6912690454883537	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-130	233	6912690455863751	Assemblatore.exe	59fdf962f2c6ed7f
-4	282	6913347944720212	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-283	522	6913347947050737	Assemblatore.exe	59fdf962f2c6ed7f
-3	310	6913591872607856	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-310	646	6913591875928598	Assemblatore.exe	59fdf962f2c6ed7f
-2	133	6913593716178141	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-134	232	6913593717138432	Assemblatore.exe	59fdf962f2c6ed7f
-2	140	6913604700089964	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
-141	253	6913604701160203	Assemblatore.exe	59fdf962f2c6ed7f
 2	118	6913605722466852	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
 119	215	6913605723395836	Assemblatore.exe	59fdf962f2c6ed7f
+15	194	6914132576523467	CMakeFiles/Assemblatore.dir/parser.c.obj	cf84afd0e678ea41
+3	221	6914132576823537	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
+221	601	6914132580519986	Assemblatore.exe	8193826c74d3e06d
