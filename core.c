@@ -69,6 +69,7 @@ pLine readFile(char *fileName, pSymbolTable symbleTable){
         }
 
     }
+    fclose(file);
     return head;
 }
 
@@ -293,46 +294,49 @@ int isEligibleA(char *str){
 pBitString convertToBitString(pLine headLine, pSymbolTable symbleTable){
     pBitString head = NULL;
     int contatore = 16;
-
+    char stringOfBit[17];
+    char app[17];
+    char temp[100];
+    int val;
     while (headLine != NULL){
         if  (identifyInstruction(headLine->codeLine) == 1){
             if (isEligibleA(headLine->codeLine)==1){  // se è una variabile o un'etichetta
 
-                char bitString[17];
-                char *temp = headLine->codeLine+1;
+
+                 strcpy(temp,headLine->codeLine+1);
 
                 if (!(headLine->codeLine[1] >= '0' && headLine->codeLine[1] <= '9')){  // se è un'etichetta
 
                     // controlla se è in symbol table
                     // se non c'è aggiungilo con il valore del contatore
-                    int val= searchSymbol(symbleTable, temp);
+                    val= searchSymbol(symbleTable, temp);
                     if (val==-1){
                         // inserisci il simbolo in tabella
                         insertSymbolInQueue(symbleTable, temp, contatore);
-                        char app[17];
+
                         convertIntToString(temp,contatore);
                         app[0] = '@';
                         app[1] = '\0';
                         strcat(app, temp);
 
-                        convertAinstruction(app, bitString);
-                        head = insertBitStringInQueue(head, bitString);
+                        convertAinstruction(app, stringOfBit);
+                        head = insertBitStringInQueue(head, stringOfBit);
                         contatore++;
                     }else{
-                        char app[17];
+
                         convertIntToString(temp,val);
                         app[0] = '@';
                         app[1] = '\0';
                         strcat(app, temp);
 
-                        convertAinstruction(app, bitString);
-                        head = insertBitStringInQueue(head, bitString);
+                        convertAinstruction(app, stringOfBit);
+                        head = insertBitStringInQueue(head, stringOfBit);
                     }
 
                 }else{
 
-                    convertAinstruction(headLine->codeLine, bitString);
-                    head = insertBitStringInQueue(head, bitString);
+                    convertAinstruction(headLine->codeLine, stringOfBit);
+                    head = insertBitStringInQueue(head, stringOfBit);
                 }
             } else {
                 printf("Errore: %s istruzione A non valida\n", headLine->codeLine);
@@ -342,9 +346,9 @@ pBitString convertToBitString(pLine headLine, pSymbolTable symbleTable){
 
 
         } else{
-            char bitString[17];
-            if (convertCinstruction(headLine->codeLine, bitString)==1){
-                head = insertBitStringInQueue(head, bitString);
+
+            if (convertCinstruction(headLine->codeLine, stringOfBit)==1){
+                head = insertBitStringInQueue(head, stringOfBit);
             } else {
                 printf("Errore: %s istruzione C non valida\n", headLine->codeLine);
             }
@@ -365,7 +369,7 @@ pBitString convertToBitString(pLine headLine, pSymbolTable symbleTable){
 void convertAinstruction(char *line, char *bitString){
     if (*line== '@'){
         line++;
-        int num = parseint(line);
+        int num = parseInt(line);
         base10ToBase2on16bit(num, bitString);
     }
 }
@@ -388,4 +392,5 @@ void writeFile(pBitString head, char *fileName){
         fprintf(file, "%s\n", temp->machineLangaugeLine);
         temp = temp->next;
     }
+    fclose(file);
 }

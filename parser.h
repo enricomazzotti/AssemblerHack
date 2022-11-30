@@ -15,7 +15,7 @@
 
 void trimAll(char *str); // Rimuove gli spazi bianchi e le tabulazioni da una stringa
 void removeComments(char *str); // Rimuove i commenti da una stringa
-int parseint(const char *str); // Converte una stringa in un intero
+int parseInt(const char *str); // Converte una stringa in un intero
 void base10ToBase2on16bit(int num, char *bitString); // Converte un intero in una stringa binaria
 int identifyInstruction(const char *inst); // Ritorna 0 se label, 1 se a inst, 2 c inst
 void removeBrackets(char*); // Rimuove le patentesi da una stringa, tipicamente una label

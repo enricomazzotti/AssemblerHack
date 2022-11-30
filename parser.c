@@ -13,7 +13,7 @@ void trimAll(char *str){
     char *temp = str;
     while(*temp != '\0'){
 
-        if(*temp != ' ' && *temp != '\t' && *temp != '\n'){
+        if(*temp != ' ' && *temp != '\t' && *temp != '\n' && *temp != '\r'){
             *str = *temp;
             str++;
         }
@@ -36,7 +36,7 @@ void removeComments(char *str){
     *str = '\0';
 }
 
-int parseint(const char *str){
+int parseInt(const char *str){
     int i = 0;
     int num = 0;
     while(str[i] != '\0'){
@@ -92,7 +92,7 @@ void convertIntToString(char *str, int num){
 }
 
 void reverseString(char *str){
-    int l = strlen(str);
+    unsigned long long l = strlen(str);
     char app[l];
     int i;
     for (i = 0; i < l; i++) {
