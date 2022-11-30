@@ -16,47 +16,36 @@ char *getFileName(const char *str);
 
 int main(int argc,char *argv[]) {
     char fileName[100];
-    FILE *file;
+    FILE *file = NULL;
     char fileToOpen[100];
 
     if (argc > 1) {
         strcpy(fileToOpen,argv[1]);
         strcpy(fileName,  getFileName(fileToOpen));
+
+        file = fopen(fileToOpen, "r");
+        if(file != NULL){
+            fclose(file);
+
+            pSymbolTable symbleTable = initSymbolTable();
+            printf("Sto leggendo il file %s\n", fileToOpen);
+            pLine code = readFile(fileToOpen, symbleTable);
+
+            printf("Sto traducendo il file\n");
+            pBitString machineLanguageCode = convertToBitString(code,symbleTable);
+
+            strcat(fileName, ".hack");
+            printf("Sto scrivendo il file %s\n", fileName);
+            writeFile(machineLanguageCode, fileName);
+            printf("Processo terminato\n");
+
+        } else {
+            printf("Il file non esiste.\n");
+        }
+    } else {
+        printf("Nessun parametro passato.\n");
     }
 
-
-
-    int failed = 0;
-    do{
-        if (argc == 1 && failed==1)
-        {
-            printf("Inserisci il nome del file da convertire:");
-            scanf("%s", fileToOpen);
-
-
-            strcpy(fileName,  getFileName(fileToOpen));
-
-        }
-        file = fopen(fileToOpen, "r");
-        if(file == NULL){
-            printf("Il file non esiste, riprova.\n");
-            failed = 1;
-        }
-    } while (file == NULL);
-    fclose(file);
-
-
-    pSymbolTable symbleTable = initSymbolTable();
-    printf("Sto leggendo il file %s\n", fileToOpen);
-    pLine code = readFile(fileToOpen, symbleTable);
-
-    printf("Sto traducendo il file\n");
-    pBitString machineLanguageCode = convertToBitString(code,symbleTable);
-
-    strcat(fileName, ".hack");
-    printf("Sto scrivendo il file %s\n", fileName);
-    writeFile(machineLanguageCode, fileName);
-    printf("Processo terminato\n");
     return 0;
 }
 
