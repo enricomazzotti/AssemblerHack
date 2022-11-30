@@ -30,12 +30,12 @@ int main(int argc,char *argv[]) {
     do{
         if (argc == 1 && failed==1)
         {
-            printf("Inserisci il nome del file da convertire (senza estensione):");
-            scanf("%s", fileName);
+            printf("Inserisci il nome del file da convertire:");
+            scanf("%s", fileToOpen);
 
-            strcpy(fileToOpen, fileName);
 
-            strcat(fileToOpen, ".asm");
+            strcpy(fileName,  getFileName(fileToOpen));
+
         }
         file = fopen(fileToOpen, "r");
         if(file == NULL){
@@ -47,17 +47,16 @@ int main(int argc,char *argv[]) {
 
 
     pSymbolTable symbleTable = initSymbolTable();
-
+    printf("Sto leggendo il file %s\n", fileToOpen);
     pLine code = readFile(fileToOpen, symbleTable);
 
-
+    printf("Sto traducendo il file\n");
     pBitString machineLanguageCode = convertToBitString(code,symbleTable);
 
     strcat(fileName, ".hack");
+    printf("Sto scrivendo il file %s\n", fileName);
     writeFile(machineLanguageCode, fileName);
-    printf("File convertito con successo!\n");
-    getchar();
-
+    printf("Processo terminato\n");
     return 0;
 }
 
@@ -70,6 +69,7 @@ char *getFileName(const char *str){
         i = str_len;
     char *res = malloc(sizeof(char) * (i  + 1));
     strncpy(res, str, i);
+    res[i] = '\0';
     return res;
 }
 

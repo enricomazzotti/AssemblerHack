@@ -335,7 +335,7 @@ pBitString convertToBitString(pLine headLine, pSymbolTable symbleTable){
                     head = insertBitStringInQueue(head, bitString);
                 }
             } else {
-                printf("Errore: %s istruzione A valida", headLine->codeLine);
+                printf("Errore: %s istruzione A non valida\n", headLine->codeLine);
             }
 
 
@@ -346,7 +346,7 @@ pBitString convertToBitString(pLine headLine, pSymbolTable symbleTable){
             if (convertCinstruction(headLine->codeLine, bitString)==1){
                 head = insertBitStringInQueue(head, bitString);
             } else {
-                printf("Errore: %s istruzione C valida", headLine->codeLine);
+                printf("Errore: %s istruzione C non valida\n", headLine->codeLine);
             }
         }
         headLine = headLine->next;
