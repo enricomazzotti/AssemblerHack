@@ -105,7 +105,7 @@ void reverseString(char *str){
 }
 
 void getDest(char *str,char *dest){
-    if (strchr(str, '=') == NULL) {
+    if (strGetChr(str, '=') == NULL) {
         strcpy(dest, "null");
         return;
     }
@@ -117,10 +117,10 @@ void getDest(char *str,char *dest){
     dest[i] = '\0';
 }
 void getComp(char *str,char *comp){
-    if (strchr(str, '=') == NULL && strchr(str, ';') == NULL) {
+    if (strGetChr(str, '=') == NULL && strGetChr(str, ';') == NULL) {
         strcpy(comp, str);
     }
-    else if (strchr(str, '=') == NULL){
+    else if (strGetChr(str, '=') == NULL){
         int i = 0;
         while ( str[i] != ';' ){
             comp[i] = str[i];
@@ -128,7 +128,7 @@ void getComp(char *str,char *comp){
         }
         comp[i] = '\0';
     }
-    else if (strchr(str, ';') == NULL){
+    else if (strGetChr(str, ';') == NULL){
         int i = 0;
         while ( str[i] != '=' ){
             i++;
@@ -159,7 +159,7 @@ void getComp(char *str,char *comp){
 }
 void getJump(char *str,char *jump){
 
-    if (strchr(str, ';') == NULL) {
+    if (strGetChr(str, ';') == NULL) {
         strcpy(jump, "null");
         return;
     }
@@ -176,4 +176,15 @@ void getJump(char *str,char *jump){
     }
     jump[j] = '\0';
 
+}
+
+char *strGetChr(char *str, char c) {
+    char *temp =  str;
+    while (*temp != '\0') {
+        if (*temp == c) {
+            return temp;
+        }
+        temp++;
+    }
+    return NULL;
 }

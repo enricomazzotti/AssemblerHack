@@ -36,3 +36,9 @@
 112	225	6915352127100057	Assemblatore.exe	b2b886a36c6692f2
 2	121	6915352422878845	CMakeFiles/Assemblatore.dir/core.c.obj	9b2eacc78449996c
 122	245	6915352424026643	Assemblatore.exe	b2b886a36c6692f2
+12	135	6915455330980287	CMakeFiles/Assemblatore.dir/main.c.obj	8cbf8bb90289c57c
+17	143	6915455331048893	CMakeFiles/Assemblatore.dir/parser.c.obj	cf84afd0e678ea41
+2	154	6915455331184428	CMakeFiles/Assemblatore.dir/core.c.obj	9b2eacc78449996c
+154	286	6915455332463500	Assemblatore.exe	b2b886a36c6692f2
+2	89	6915456255201158	CMakeFiles/Assemblatore.dir/parser.c.obj	cf84afd0e678ea41
+89	197	6915456256245088	Assemblatore.exe	b2b886a36c6692f2

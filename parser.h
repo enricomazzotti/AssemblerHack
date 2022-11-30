@@ -21,6 +21,7 @@ int identifyInstruction(const char *inst); // Ritorna 0 se label, 1 se a inst, 2
 void removeBrackets(char*); // Rimuove le patentesi da una stringa, tipicamente una label
 void convertIntToString(char *str, int num); // Converte un intero in una stringa
 void reverseString(char *str); // Inverte l'ordine dei caratteri nella stringa
+char *strGetChr(char *str, char c); // Ritorna un puntatore al primo carattere uguale a c nella stringa str
 void getDest(char *, char *);  // Ottiene la sustring dest da una C instruction
 void getComp(char *, char *);  // Ottiene la sustring comp da una C instruction
 void getJump(char *, char *);  // Ottiene la sustring jump da una C instruction
